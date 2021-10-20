@@ -235,14 +235,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 81dd31cd0fe12804bb37a1138427dc98, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  xLength: 1
-  yLength: 1
-  lineWidth: 0.1
+  xLength: 14
+  yLength: 6
+  lineWidth: 0.08
   materialLine: {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
   colorForLine:
     serializedVersion: 2
-    key0: {r: 0.8679245, g: 0.5109291, b: 0.5109291, a: 1}
-    key1: {r: 0.8679245, g: 0.5109291, b: 0.5109291, a: 1}
+    key0: {r: 0.103773594, g: 0.103773594, b: 0.103773594, a: 1}
+    key1: {r: 0.103773594, g: 0.103773594, b: 0.103773594, a: 1}
     key2: {r: 0, g: 0, b: 0, a: 0}
     key3: {r: 0, g: 0, b: 0, a: 0}
     key4: {r: 0, g: 0, b: 0, a: 0}
@@ -268,8 +268,8 @@ MonoBehaviour:
     m_Mode: 0
     m_NumColorKeys: 2
     m_NumAlphaKeys: 2
-  _lineX: {fileID: 0}
-  _lineY: {fileID: 0}
+  enableArrowheadX: 1
+  enableArrowheadY: 1
 --- !u!4 &1269772032
 Transform:
   m_ObjectHideFlags: 0
