@@ -235,9 +235,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 81dd31cd0fe12804bb37a1138427dc98, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  xLength: 14
+  xLength: 13.5
   yLength: 6
   lineWidth: 0.08
+  indexWidth: 0.15
   materialLine: {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
   colorForLine:
     serializedVersion: 2

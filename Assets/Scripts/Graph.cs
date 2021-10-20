@@ -5,17 +5,20 @@ public class Graph : MonoBehaviour
 {
     // Constants
     private const float ErrorMargin = float.Epsilon;
+    private const float WidthDivider = 1.5f;
 
     // Axis
-    [Header("Axis Configuration")] [Range(0.0f, 15.0f)]
-    public float xLength;
-
-    [Range(0.0f, 7.0f)] public float yLength;
-    [Range(0.01f, 0.3f)] public float lineWidth;
+    [Header("Axis Configuration")] 
+    [Range(0.01f, 15.0f)] public float xLength;
+    [Range(0.001f, 7.0f)] public float yLength;
+    [Range(0.0011f, 0.3f)] public float lineWidth;
+    [Range(0.1f, 1f)] public float indexWidth;
     public Material materialLine;
     public Gradient colorForLine;
     private LineRenderer _lineX;
     private LineRenderer _lineY;
+    private LineRenderer[] _xList;
+    private LineRenderer[] _yList;
 
     // Arrow head
     public bool enableArrowheadX = true;
@@ -30,6 +33,7 @@ public class Graph : MonoBehaviour
     private float _changedY;
     private bool _changedEnableArrowheadX;
     private bool _changedEnableArrowheadY;
+    private float _changedIndexWidth;
 
 
     private void Start()
@@ -38,16 +42,22 @@ public class Graph : MonoBehaviour
 
         // Inits the Lines
         _lineX = InitLine();
+        _lineX.name = "X Axis";
         _lineY = InitLine();
+        _lineY.name = "Y Axis";
 
         // Make arrow head
         _headX = InitHead();
+        _headX.name = "Arrowhead X";
         _headX.transform.Rotate(new Vector3(0, 0, -90));
         _headY = InitHead();
+        _headY.name = "Arrowhead Y";
 
         // Init first lines and values
         ChangeVal();
         DrawAxis();
+        MoveHead();
+        DrawIndex();
     }
 
     private void Update()
@@ -55,6 +65,8 @@ public class Graph : MonoBehaviour
         if (ChangeVal())
         {
             DrawAxis();
+            MoveHead();
+            DrawIndex();
         }
     }
 
@@ -103,8 +115,58 @@ public class Graph : MonoBehaviour
 
         _headY.endWidth = lineWidth;
         _headY.startWidth = lineWidth;
+    }
 
-        MoveHead();
+    // Creates the indices and keeps them updated
+    private void DrawIndex()
+    {
+        if (_xList != null && _yList != null)
+        {
+            foreach (var lis in _xList)
+            {
+                Destroy(lis.gameObject);
+            }
+
+            foreach (var lis in _yList)
+            {
+                Destroy(lis.gameObject);
+            }
+        }
+
+        int xIndex = (int) Mathf.Floor(xLength);
+        if (0 == xIndex - xLength && enableArrowheadX) xIndex--;
+
+        int yIndex = (int) Mathf.Floor(yLength);
+        if (0 == yIndex - yLength && enableArrowheadY) yIndex--;
+
+        _xList = new LineRenderer[xIndex];
+        _yList = new LineRenderer[yIndex];
+
+        IndexSetter(_xList, "X Index", true);
+        IndexSetter(_yList, "Y Index", false);
+    }
+
+    // Sets the indices to their place
+    private void IndexSetter(LineRenderer[] ind, string objectName, bool t)
+    {
+        var x = 0;
+        var y = 0;
+
+        if (t) x = 1;
+        else y = 1;
+
+        var widthDivider = lineWidth / WidthDivider;
+        for (int i = 0; i < ind.Length; i++)
+        {
+            ind[i] = InitLine();
+            ind[i].name = objectName;
+            ind[i].startWidth = widthDivider;
+            ind[i].endWidth = widthDivider;
+            ind[i].SetPosition(0,
+                new Vector3(x * (i + 1) + y * (-indexWidth), y * (i + 1) + x * (-indexWidth)) + _posOfOrigin);
+            ind[i].SetPosition(1,
+                new Vector3(x * (i + 1) + y * (indexWidth), y * (i + 1) + x * (indexWidth)) + _posOfOrigin);
+        }
     }
 
     // Moves the arrowhead to the end of the axis
@@ -127,9 +189,10 @@ public class Graph : MonoBehaviour
     // Checks if the values of the axis was changed
     private bool ChangeVal()
     {
-        if (Math.Abs(this._changedX - this.xLength) < ErrorMargin &&
-            Math.Abs(this._changedY - this.yLength) < ErrorMargin &&
-            Math.Abs(this._changedWidth - this.lineWidth) < ErrorMargin &&
+        if (BoolfEquals(_changedX, xLength) &&
+            BoolfEquals(_changedY, yLength) &&
+            BoolfEquals(_changedWidth, lineWidth) &&
+            BoolfEquals(_changedIndexWidth, indexWidth) &&
             enableArrowheadX == _changedEnableArrowheadX &&
             enableArrowheadY == _changedEnableArrowheadY) return false;
 
@@ -139,13 +202,21 @@ public class Graph : MonoBehaviour
                   "\t\tenableArrowheadX: " + enableArrowheadX + "\t_changedEnableArrowheadX: " +
                   _changedEnableArrowheadX + "\n" +
                   "\t\tenableArrowheadY: " + enableArrowheadY + "\t_changedEnableArrowheadY: " +
-                  _changedEnableArrowheadY);
+                  _changedEnableArrowheadY + "\n" +
+                  "\t\tindexWidth: " + indexWidth + "\t_changedIndexWidth: " + _changedIndexWidth);
 
         this._changedX = this.xLength;
         this._changedY = this.yLength;
         this._changedWidth = this.lineWidth;
         this._changedEnableArrowheadX = this.enableArrowheadX;
         this._changedEnableArrowheadY = this.enableArrowheadY;
+        this._changedIndexWidth = this.indexWidth;
         return true;
+    }
+
+    // Calculates if floats are equal
+    private bool BoolfEquals(float a, float b)
+    {
+        return Math.Abs(a - b) < ErrorMargin;
     }
 }
