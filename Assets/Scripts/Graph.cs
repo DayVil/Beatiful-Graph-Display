@@ -1,27 +1,44 @@
 using System;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Graph : MonoBehaviour
 {
     // Constants
     private const float ErrorMargin = float.Epsilon;
     private const float WidthDivider = 1.5f;
+    private const float MaxX = 15f;
+    private const float MaxY = 7f;
 
+    public GameObject canvasGameObj;
+    
     // Axis
-    [Header("Axis Configuration")] 
-    [Range(0.01f, 15.0f)] public float xLength;
-    [Range(0.001f, 7.0f)] public float yLength;
+    [Header("Axis Configuration")] [Range(0.01f, MaxX)]
+    public float xLength;
+
+    [Range(0.001f, MaxY)] public float yLength;
     [Range(0.0011f, 0.3f)] public float lineWidth;
-    [Range(0.1f, 1f)] public float indexWidth;
+
     public Material materialLine;
     public Gradient colorForLine;
     private LineRenderer _lineX;
     private LineRenderer _lineY;
-    private LineRenderer[] _xList;
-    private LineRenderer[] _yList;
+
+    // Index
+    [Header("Index Configuration")] [Range(0.1f, 1f)]
+    public float indexWidth;
+    public int toMaxX;
+    public int toMaxY;
+    private int _xIndex;
+    private int _yIndex;
+    public Material materialNum;
+    private LineRenderer[] _xBarList;
+    private LineRenderer[] _yBarList;
+    private Text[] _xNumList;
+    private Text[] _yNumList;
 
     // Arrow head
-    public bool enableArrowheadX = true;
+    [Header("Arrowhead Configuration")] public bool enableArrowheadX = true;
     public bool enableArrowheadY = true;
     private LineRenderer _headX;
     private LineRenderer _headY;
@@ -34,9 +51,11 @@ public class Graph : MonoBehaviour
     private bool _changedEnableArrowheadX;
     private bool _changedEnableArrowheadY;
     private float _changedIndexWidth;
+    private int _changedMaxX;
+    private int _changedMaxY;
 
-
-    private void Start()
+    // TODO clean up code with proper parents
+    private void Awake()
     {
         this._posOfOrigin = transform.position;
 
@@ -46,40 +65,78 @@ public class Graph : MonoBehaviour
         _lineY = InitLine();
         _lineY.name = "Y Axis";
 
+        // Inits Index
+        _xIndex = (int) Mathf.Floor(MaxX);
+        _yIndex = (int) Mathf.Floor(MaxY);
+        InitIndexLists();
+
         // Make arrow head
         _headX = InitHead();
         _headX.name = "Arrowhead X";
         _headX.transform.Rotate(new Vector3(0, 0, -90));
         _headY = InitHead();
         _headY.name = "Arrowhead Y";
+    }
 
-        // Init first lines and values
-        ChangeVal();
-        DrawAxis();
-        MoveHead();
-        DrawIndex();
+    private void Start()
+    {
+        // Init first refresh
+        UpdatedComponents();
+
+
+        // TODO remove this
+        Text txt = new GameObject().AddComponent<Text>();
+        txt.name = "Ind";
+        txt.transform.position = _posOfOrigin;
+        txt.alignment = TextAnchor.UpperCenter;
+        txt.transform.SetParent(canvasGameObj.transform, false);
+        txt.material = materialNum;
+        txt.font = Font.CreateDynamicFontFromOSFont("Arial", 14);
+        txt.fontSize = 45;
+    
+        txt.text = "1";
+        txt.transform.position = new Vector3(-7, -3.7f);
     }
 
     private void Update()
     {
         if (ChangeVal())
         {
-            DrawAxis();
-            MoveHead();
-            DrawIndex();
+            UpdatedComponents();
         }
     }
 
+    private void UpdatedComponents()
+    {
+        DrawAxis();
+        MoveHead();
+        DrawIndex();
+        // TODO Implement draw index number
+        // DrawIndexNumber();
+    }
+
     // Inits a usable Linerenderer for this project
+
     private LineRenderer InitLine()
     {
-        LineRenderer l = new GameObject().AddComponent<LineRenderer>();
+        var l = new GameObject().AddComponent<LineRenderer>();
         l.gameObject.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
         l.material = materialLine;
         l.colorGradient = colorForLine;
         l.startWidth = lineWidth;
         l.endWidth = lineWidth;
         return l;
+    }
+
+    private void InitIndexLists()
+    {
+        _xBarList = new LineRenderer[_xIndex];
+        _yBarList = new LineRenderer[_yIndex];
+        IndexSetter(_xBarList, "X Index", true);
+        IndexSetter(_yBarList, "Y Index", false);
+
+        _xNumList = new Text[_xIndex];
+        _yNumList = new Text[_yIndex];
     }
 
     // Inits a usable Arrowhead for this project
@@ -120,30 +177,17 @@ public class Graph : MonoBehaviour
     // Creates the indices and keeps them updated
     private void DrawIndex()
     {
-        if (_xList != null && _yList != null)
+        for (int i = 0; i < _xBarList.Length; i++)
         {
-            foreach (var lis in _xList)
-            {
-                Destroy(lis.gameObject);
-            }
-
-            foreach (var lis in _yList)
-            {
-                Destroy(lis.gameObject);
-            }
+            if (i + 1 < xLength || (!enableArrowheadX && i + 1 <= xLength)) _xBarList[i].enabled = true;
+            else _xBarList[i].enabled = false;
         }
 
-        int xIndex = (int) Mathf.Floor(xLength);
-        if (0 == xIndex - xLength && enableArrowheadX) xIndex--;
-
-        int yIndex = (int) Mathf.Floor(yLength);
-        if (0 == yIndex - yLength && enableArrowheadY) yIndex--;
-
-        _xList = new LineRenderer[xIndex];
-        _yList = new LineRenderer[yIndex];
-
-        IndexSetter(_xList, "X Index", true);
-        IndexSetter(_yList, "Y Index", false);
+        for (int i = 0; i < _yBarList.Length; i++)
+        {
+            if (i + 1 < yLength || (!enableArrowheadY && i + 1 <= yLength)) _yBarList[i].enabled = true;
+            else _yBarList[i].enabled = false;
+        }
     }
 
     // Sets the indices to their place
@@ -193,6 +237,8 @@ public class Graph : MonoBehaviour
             BoolfEquals(_changedY, yLength) &&
             BoolfEquals(_changedWidth, lineWidth) &&
             BoolfEquals(_changedIndexWidth, indexWidth) &&
+            toMaxX == _changedMaxX &&
+            toMaxY == _changedMaxY &&
             enableArrowheadX == _changedEnableArrowheadX &&
             enableArrowheadY == _changedEnableArrowheadY) return false;
 
@@ -211,6 +257,8 @@ public class Graph : MonoBehaviour
         this._changedEnableArrowheadX = this.enableArrowheadX;
         this._changedEnableArrowheadY = this.enableArrowheadY;
         this._changedIndexWidth = this.indexWidth;
+        this._changedMaxX = toMaxX;
+        this._changedMaxY = toMaxY;
         return true;
     }
 
