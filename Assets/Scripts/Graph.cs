@@ -58,11 +58,11 @@ public class Graph : MonoBehaviour
     // Inits all variables
     private void Awake()
     {
-        this._posOfOrigin = transform.position;
+        _posOfOrigin = transform.position;
 
         // Inits the Lines
-        _lineX = InitLine("Axis X", this.transform.GetChild(0).transform);
-        _lineY = InitLine("Axis Y", this.transform.GetChild(1).transform);
+        _lineX = InitLine("Axis X", transform.GetChild(0).transform);
+        _lineY = InitLine("Axis Y", transform.GetChild(1).transform);
 
         // Inits Index
         _xIndex = (int) Mathf.Floor(MaxX);
@@ -71,9 +71,9 @@ public class Graph : MonoBehaviour
         InitIndexNum();
 
         // Make arrow head
-        _headX = InitHead("Arrowhead X", this.transform.GetChild(0).transform);
+        _headX = InitHead("Arrowhead X", transform.GetChild(0).transform);
         _headX.transform.Rotate(new Vector3(0, 0, -90));
-        _headY = InitHead("Arrowhead Y", this.transform.GetChild(1).transform);
+        _headY = InitHead("Arrowhead Y", transform.GetChild(1).transform);
     }
 
     // Starts first update cycle
@@ -86,10 +86,7 @@ public class Graph : MonoBehaviour
     // Checks if values were changed and then updates it
     private void Update()
     {
-        if (ChangeVal())
-        {
-            UpdatedComponents();
-        }
+        if (ChangeVal()) UpdatedComponents();
     }
 
     // Updates all components
@@ -115,13 +112,13 @@ public class Graph : MonoBehaviour
         return l;
     }
 
-    // Inits the array line for all possible index lines
+    // Inits the array line for all possible index lines.
     private void InitIndexLists()
     {
         _xBarList = new LineRenderer[_xIndex];
         _yBarList = new LineRenderer[_yIndex];
-        IndexSetter(_xBarList, "Index X", true, this.transform.GetChild(0).transform);
-        IndexSetter(_yBarList, "Index Y", false, this.transform.GetChild(1).transform);
+        IndexSetter(_xBarList, "Index X", true, transform.GetChild(0).transform);
+        IndexSetter(_yBarList, "Index Y", false, transform.GetChild(1).transform);
 
         _xNumList = new Text[_xIndex];
         _yNumList = new Text[_yIndex];
@@ -133,14 +130,14 @@ public class Graph : MonoBehaviour
         _xNumList = new Text[_xIndex];
         _yNumList = new Text[_yIndex];
 
-        for (int i = 0; i < _xNumList.Length; i++)
+        for (var i = 0; i < _xNumList.Length; i++)
         {
             _xNumList[i] = InitNum("Number X");
             _xNumList[i].fontStyle = FontStyle.Bold;
             _xNumList[i].transform.position = new Vector3(-7, -3.7f) + new Vector3(i + 1, 0);
         }
 
-        for (int i = 0; i < _yNumList.Length; i++)
+        for (var i = 0; i < _yNumList.Length; i++)
         {
             _yNumList[i] = InitNum("Number Y");
             _yNumList[i].fontStyle = FontStyle.Bold;
@@ -151,7 +148,7 @@ public class Graph : MonoBehaviour
     // Inits a single number
     private Text InitNum(string nameObject)
     {
-        Text txt = new GameObject(nameObject).AddComponent<Text>();
+        var txt = new GameObject(nameObject).AddComponent<Text>();
         txt.transform.position = _posOfOrigin;
         txt.alignment = TextAnchor.UpperCenter;
         txt.transform.SetParent(canvasGameObj.transform, false);
@@ -165,7 +162,7 @@ public class Graph : MonoBehaviour
     // Inits a usable Arrowhead for this project
     private LineRenderer InitHead(string lineName, Transform parent)
     {
-        LineRenderer l = InitLine(lineName, parent);
+        var l = InitLine(lineName, parent);
         l.positionCount = 3;
         l.useWorldSpace = false;
 
@@ -182,13 +179,13 @@ public class Graph : MonoBehaviour
     {
         _lineX.endWidth = lineWidth;
         _lineX.startWidth = lineWidth;
-        _lineX.SetPosition(0, this._posOfOrigin);
-        _lineX.SetPosition(1, this._posOfOrigin + new Vector3(this.xLength, 0));
+        _lineX.SetPosition(0, _posOfOrigin);
+        _lineX.SetPosition(1, _posOfOrigin + new Vector3(xLength, 0));
 
         _lineY.endWidth = lineWidth;
         _lineY.startWidth = lineWidth;
-        _lineY.SetPosition(0, this._posOfOrigin - new Vector3(0, lineWidth / 2));
-        _lineY.SetPosition(1, this._posOfOrigin + new Vector3(0, this.yLength));
+        _lineY.SetPosition(0, _posOfOrigin - new Vector3(0, lineWidth / 2));
+        _lineY.SetPosition(1, _posOfOrigin + new Vector3(0, yLength));
 
         _headX.endWidth = lineWidth;
         _headX.startWidth = lineWidth;
@@ -200,47 +197,43 @@ public class Graph : MonoBehaviour
     // Creates the indices and keeps them updated
     private void DrawIndex()
     {
-        for (var i = 0; i < _xBarList.Length; i++)
-        {
-            _xBarList[i].enabled = CheckIfAppears(i, enableArrowheadX, xLength);
-        }
+        for (var i = 0; i < _xBarList.Length; i++) _xBarList[i].enabled = CheckIfAppears(i, enableArrowheadX, xLength);
 
-        for (var i = 0; i < _yBarList.Length; i++)
-        {
-            _yBarList[i].enabled = CheckIfAppears(i, enableArrowheadY, yLength);
-        }
+        for (var i = 0; i < _yBarList.Length; i++) _yBarList[i].enabled = CheckIfAppears(i, enableArrowheadY, yLength);
     }
 
     private void DrawIndexNumber()
     {
-        float tmpX = toMaxX / xLength;
-        for (int i = 0; i < _xNumList.Length; i++)
-        {
+        var tmpX = toMaxX / xLength;
+        for (var i = 0; i < _xNumList.Length; i++)
             if (CheckIfAppears(i, enableArrowheadX, xLength))
             {
-                float calc = Mathf.Round(tmpX * (i + 1));
+                var calc = Mathf.Round(tmpX * (i + 1));
                 _xNumList[i].text = calc.ToString(CultureInfo.CurrentCulture);
                 _xNumList[i].enabled = true;
             }
-            else _xNumList[i].enabled = false;
-        }
+            else
+            {
+                _xNumList[i].enabled = false;
+            }
 
-        float tmpY = toMaxY / yLength;
-        for (int i = 0; i < _yNumList.Length; i++)
-        {
+        var tmpY = toMaxY / yLength;
+        for (var i = 0; i < _yNumList.Length; i++)
             if (CheckIfAppears(i, enableArrowheadY, yLength))
             {
-                float calc = Mathf.Round(tmpY * (i + 1));
+                var calc = Mathf.Round(tmpY * (i + 1));
                 _yNumList[i].text = calc.ToString(CultureInfo.CurrentCulture);
                 _yNumList[i].enabled = true;
             }
-            else _yNumList[i].enabled = false;
-        }
+            else
+            {
+                _yNumList[i].enabled = false;
+            }
     }
 
     private bool CheckIfAppears(int cycle, bool arrowHead, float len)
     {
-        return cycle + 1 < len || (!arrowHead && cycle + 1 <= len);
+        return cycle + 1 < len || !arrowHead && cycle + 1 <= len;
     }
 
     // Sets the indices to their place
@@ -253,15 +246,15 @@ public class Graph : MonoBehaviour
         else y = 1;
 
         var widthDivider = lineWidth / WidthDivider;
-        for (int i = 0; i < ind.Length; i++)
+        for (var i = 0; i < ind.Length; i++)
         {
             ind[i] = InitLine(objectName, parent);
             ind[i].startWidth = widthDivider;
             ind[i].endWidth = widthDivider;
             ind[i].SetPosition(0,
-                new Vector3(x * (i + 1) + y * (-indexWidth), y * (i + 1) + x * (-indexWidth)) + _posOfOrigin);
+                new Vector3(x * (i + 1) + y * -indexWidth, y * (i + 1) + x * -indexWidth) + _posOfOrigin);
             ind[i].SetPosition(1,
-                new Vector3(x * (i + 1) + y * (indexWidth), y * (i + 1) + x * (indexWidth)) + _posOfOrigin);
+                new Vector3(x * (i + 1) + y * indexWidth, y * (i + 1) + x * indexWidth) + _posOfOrigin);
         }
     }
 
@@ -271,15 +264,9 @@ public class Graph : MonoBehaviour
         _headX.enabled = enableArrowheadX;
         _headY.enabled = enableArrowheadY;
 
-        if (enableArrowheadX)
-        {
-            _headX.transform.position = this._posOfOrigin + new Vector3(xLength - 0.25f, 0);
-        }
+        if (enableArrowheadX) _headX.transform.position = _posOfOrigin + new Vector3(xLength - 0.25f, 0);
 
-        if (enableArrowheadY)
-        {
-            _headY.transform.position = this._posOfOrigin + new Vector3(0, yLength - 0.25f);
-        }
+        if (enableArrowheadY) _headY.transform.position = _posOfOrigin + new Vector3(0, yLength - 0.25f);
     }
 
     // Checks if the values of the axis was changed
@@ -303,14 +290,14 @@ public class Graph : MonoBehaviour
                   _changedEnableArrowheadY + "\n" +
                   "\t\tindexWidth: " + indexWidth + "\t_changedIndexWidth: " + _changedIndexWidth);
 
-        this._changedX = this.xLength;
-        this._changedY = this.yLength;
-        this._changedWidth = this.lineWidth;
-        this._changedEnableArrowheadX = this.enableArrowheadX;
-        this._changedEnableArrowheadY = this.enableArrowheadY;
-        this._changedIndexWidth = this.indexWidth;
-        this._changedMaxX = toMaxX;
-        this._changedMaxY = toMaxY;
+        _changedX = xLength;
+        _changedY = yLength;
+        _changedWidth = lineWidth;
+        _changedEnableArrowheadX = enableArrowheadX;
+        _changedEnableArrowheadY = enableArrowheadY;
+        _changedIndexWidth = indexWidth;
+        _changedMaxX = toMaxX;
+        _changedMaxY = toMaxY;
         return true;
     }
 
