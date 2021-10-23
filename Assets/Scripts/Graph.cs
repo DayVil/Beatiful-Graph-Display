@@ -61,8 +61,8 @@ public class Graph : MonoBehaviour
         this._posOfOrigin = transform.position;
 
         // Inits the Lines
-        _lineX = InitLine("Axis X");
-        _lineY = InitLine("Axis Y");
+        _lineX = InitLine("Axis X", this.transform.GetChild(0).transform);
+        _lineY = InitLine("Axis Y", this.transform.GetChild(1).transform);
 
         // Inits Index
         _xIndex = (int) Mathf.Floor(MaxX);
@@ -71,9 +71,9 @@ public class Graph : MonoBehaviour
         InitIndexNum();
 
         // Make arrow head
-        _headX = InitHead("Arrowhead X");
+        _headX = InitHead("Arrowhead X", this.transform.GetChild(0).transform);
         _headX.transform.Rotate(new Vector3(0, 0, -90));
-        _headY = InitHead("Arrowhead Y");
+        _headY = InitHead("Arrowhead Y", this.transform.GetChild(1).transform);
     }
 
     // Starts first update cycle
@@ -102,10 +102,11 @@ public class Graph : MonoBehaviour
     }
 
     // Inits a usable Linerenderer for this project
-    private LineRenderer InitLine(string lineName)
+    private LineRenderer InitLine(string lineName, Transform parent)
     {
         var l = new GameObject(lineName).AddComponent<LineRenderer>();
         l.gameObject.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
+        l.transform.SetParent(parent);
         l.material = materialLine;
         l.startColor = colorForLine;
         l.endColor = colorForLine;
@@ -119,8 +120,8 @@ public class Graph : MonoBehaviour
     {
         _xBarList = new LineRenderer[_xIndex];
         _yBarList = new LineRenderer[_yIndex];
-        IndexSetter(_xBarList, "Index X", true);
-        IndexSetter(_yBarList, "Index Y", false);
+        IndexSetter(_xBarList, "Index X", true, this.transform.GetChild(0).transform);
+        IndexSetter(_yBarList, "Index Y", false, this.transform.GetChild(1).transform);
 
         _xNumList = new Text[_xIndex];
         _yNumList = new Text[_yIndex];
@@ -162,9 +163,9 @@ public class Graph : MonoBehaviour
     }
 
     // Inits a usable Arrowhead for this project
-    private LineRenderer InitHead(string lineName)
+    private LineRenderer InitHead(string lineName, Transform parent)
     {
-        LineRenderer l = InitLine(lineName);
+        LineRenderer l = InitLine(lineName, parent);
         l.positionCount = 3;
         l.useWorldSpace = false;
 
@@ -243,7 +244,7 @@ public class Graph : MonoBehaviour
     }
 
     // Sets the indices to their place
-    private void IndexSetter(LineRenderer[] ind, string objectName, bool t)
+    private void IndexSetter(LineRenderer[] ind, string objectName, bool t, Transform parent)
     {
         var x = 0;
         var y = 0;
@@ -254,7 +255,7 @@ public class Graph : MonoBehaviour
         var widthDivider = lineWidth / WidthDivider;
         for (int i = 0; i < ind.Length; i++)
         {
-            ind[i] = InitLine(objectName);
+            ind[i] = InitLine(objectName, parent);
             ind[i].startWidth = widthDivider;
             ind[i].endWidth = widthDivider;
             ind[i].SetPosition(0,
