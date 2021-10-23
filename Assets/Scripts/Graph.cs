@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,93 +12,78 @@ public class Graph : MonoBehaviour
     private const float MaxY = 7f;
 
     public GameObject canvasGameObj;
-    
+
     // Axis
-    [Header("Axis Configuration")] [Range(0.01f, MaxX)]
+    [Header("Axis Configuration")] [Range(1.3f, MaxX)]
     public float xLength;
 
-    [Range(0.001f, MaxY)] public float yLength;
+    [Range(1.3f, MaxY)] public float yLength;
     [Range(0.0011f, 0.3f)] public float lineWidth;
 
     public Material materialLine;
-    public Gradient colorForLine;
-    private LineRenderer _lineX;
-    private LineRenderer _lineY;
+    public Color colorForLine = Color.black;
 
     // Index
     [Header("Index Configuration")] [Range(0.1f, 1f)]
     public float indexWidth;
+
     public int toMaxX;
     public int toMaxY;
-    private int _xIndex;
-    private int _yIndex;
-    public Material materialNum;
-    private LineRenderer[] _xBarList;
-    private LineRenderer[] _yBarList;
-    private Text[] _xNumList;
-    private Text[] _yNumList;
 
     // Arrow head
     [Header("Arrowhead Configuration")] public bool enableArrowheadX = true;
     public bool enableArrowheadY = true;
-    private LineRenderer _headX;
-    private LineRenderer _headY;
-
-    // Misc
-    private Vector3 _posOfOrigin;
-    private float _changedWidth;
-    private float _changedX;
-    private float _changedY;
     private bool _changedEnableArrowheadX;
     private bool _changedEnableArrowheadY;
     private float _changedIndexWidth;
     private int _changedMaxX;
     private int _changedMaxY;
+    private float _changedWidth;
+    private float _changedX;
+    private float _changedY;
+    private LineRenderer _headX;
+    private LineRenderer _headY;
+    private LineRenderer _lineX;
+    private LineRenderer _lineY;
 
-    // TODO clean up code with proper parents
+    // Misc
+    private Vector3 _posOfOrigin;
+    private LineRenderer[] _xBarList;
+    private int _xIndex;
+    private Text[] _xNumList;
+    private LineRenderer[] _yBarList;
+    private int _yIndex;
+    private Text[] _yNumList;
+
+    // Inits all variables
     private void Awake()
     {
         this._posOfOrigin = transform.position;
 
         // Inits the Lines
-        _lineX = InitLine();
-        _lineX.name = "X Axis";
-        _lineY = InitLine();
-        _lineY.name = "Y Axis";
+        _lineX = InitLine("Axis X");
+        _lineY = InitLine("Axis Y");
 
         // Inits Index
         _xIndex = (int) Mathf.Floor(MaxX);
         _yIndex = (int) Mathf.Floor(MaxY);
         InitIndexLists();
+        InitIndexNum();
 
         // Make arrow head
-        _headX = InitHead();
-        _headX.name = "Arrowhead X";
+        _headX = InitHead("Arrowhead X");
         _headX.transform.Rotate(new Vector3(0, 0, -90));
-        _headY = InitHead();
-        _headY.name = "Arrowhead Y";
+        _headY = InitHead("Arrowhead Y");
     }
 
+    // Starts first update cycle
     private void Start()
     {
         // Init first refresh
         UpdatedComponents();
-
-
-        // TODO remove this
-        Text txt = new GameObject().AddComponent<Text>();
-        txt.name = "Ind";
-        txt.transform.position = _posOfOrigin;
-        txt.alignment = TextAnchor.UpperCenter;
-        txt.transform.SetParent(canvasGameObj.transform, false);
-        txt.material = materialNum;
-        txt.font = Font.CreateDynamicFontFromOSFont("Arial", 14);
-        txt.fontSize = 45;
-    
-        txt.text = "1";
-        txt.transform.position = new Vector3(-7, -3.7f);
     }
 
+    // Checks if values were changed and then updates it
     private void Update()
     {
         if (ChangeVal())
@@ -106,43 +92,79 @@ public class Graph : MonoBehaviour
         }
     }
 
+    // Updates all components
     private void UpdatedComponents()
     {
         DrawAxis();
         MoveHead();
         DrawIndex();
-        // TODO Implement draw index number
-        // DrawIndexNumber();
+        DrawIndexNumber();
     }
 
     // Inits a usable Linerenderer for this project
-
-    private LineRenderer InitLine()
+    private LineRenderer InitLine(string lineName)
     {
-        var l = new GameObject().AddComponent<LineRenderer>();
+        var l = new GameObject(lineName).AddComponent<LineRenderer>();
         l.gameObject.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
         l.material = materialLine;
-        l.colorGradient = colorForLine;
+        l.startColor = colorForLine;
+        l.endColor = colorForLine;
         l.startWidth = lineWidth;
         l.endWidth = lineWidth;
         return l;
     }
 
+    // Inits the array line for all possible index lines
     private void InitIndexLists()
     {
         _xBarList = new LineRenderer[_xIndex];
         _yBarList = new LineRenderer[_yIndex];
-        IndexSetter(_xBarList, "X Index", true);
-        IndexSetter(_yBarList, "Y Index", false);
+        IndexSetter(_xBarList, "Index X", true);
+        IndexSetter(_yBarList, "Index Y", false);
 
         _xNumList = new Text[_xIndex];
         _yNumList = new Text[_yIndex];
     }
 
-    // Inits a usable Arrowhead for this project
-    private LineRenderer InitHead()
+    // Inits the array for all possible numbers
+    private void InitIndexNum()
     {
-        LineRenderer l = InitLine();
+        _xNumList = new Text[_xIndex];
+        _yNumList = new Text[_yIndex];
+
+        for (int i = 0; i < _xNumList.Length; i++)
+        {
+            _xNumList[i] = InitNum("Number X");
+            _xNumList[i].fontStyle = FontStyle.Bold;
+            _xNumList[i].transform.position = new Vector3(-7, -3.7f) + new Vector3(i + 1, 0);
+        }
+
+        for (int i = 0; i < _yNumList.Length; i++)
+        {
+            _yNumList[i] = InitNum("Number Y");
+            _yNumList[i].fontStyle = FontStyle.Bold;
+            _yNumList[i].transform.position = new Vector3(-7.5f, -3.27f) + new Vector3(0, i + 1);
+        }
+    }
+
+    // Inits a single number
+    private Text InitNum(string nameObject)
+    {
+        Text txt = new GameObject(nameObject).AddComponent<Text>();
+        txt.transform.position = _posOfOrigin;
+        txt.alignment = TextAnchor.UpperCenter;
+        txt.transform.SetParent(canvasGameObj.transform, false);
+        txt.color = colorForLine;
+        txt.font = Font.CreateDynamicFontFromOSFont("Arial", 14);
+        txt.fontSize = 40;
+
+        return txt;
+    }
+
+    // Inits a usable Arrowhead for this project
+    private LineRenderer InitHead(string lineName)
+    {
+        LineRenderer l = InitLine(lineName);
         l.positionCount = 3;
         l.useWorldSpace = false;
 
@@ -177,17 +199,47 @@ public class Graph : MonoBehaviour
     // Creates the indices and keeps them updated
     private void DrawIndex()
     {
-        for (int i = 0; i < _xBarList.Length; i++)
+        for (var i = 0; i < _xBarList.Length; i++)
         {
-            if (i + 1 < xLength || (!enableArrowheadX && i + 1 <= xLength)) _xBarList[i].enabled = true;
-            else _xBarList[i].enabled = false;
+            _xBarList[i].enabled = CheckIfAppears(i, enableArrowheadX, xLength);
         }
 
-        for (int i = 0; i < _yBarList.Length; i++)
+        for (var i = 0; i < _yBarList.Length; i++)
         {
-            if (i + 1 < yLength || (!enableArrowheadY && i + 1 <= yLength)) _yBarList[i].enabled = true;
-            else _yBarList[i].enabled = false;
+            _yBarList[i].enabled = CheckIfAppears(i, enableArrowheadY, yLength);
         }
+    }
+
+    private void DrawIndexNumber()
+    {
+        float tmpX = toMaxX / xLength;
+        for (int i = 0; i < _xNumList.Length; i++)
+        {
+            if (CheckIfAppears(i, enableArrowheadX, xLength))
+            {
+                float calc = Mathf.Round(tmpX * (i + 1));
+                _xNumList[i].text = calc.ToString(CultureInfo.CurrentCulture);
+                _xNumList[i].enabled = true;
+            }
+            else _xNumList[i].enabled = false;
+        }
+
+        float tmpY = toMaxY / yLength;
+        for (int i = 0; i < _yNumList.Length; i++)
+        {
+            if (CheckIfAppears(i, enableArrowheadY, yLength))
+            {
+                float calc = Mathf.Round(tmpY * (i + 1));
+                _yNumList[i].text = calc.ToString(CultureInfo.CurrentCulture);
+                _yNumList[i].enabled = true;
+            }
+            else _yNumList[i].enabled = false;
+        }
+    }
+
+    private bool CheckIfAppears(int cycle, bool arrowHead, float len)
+    {
+        return cycle + 1 < len || (!arrowHead && cycle + 1 <= len);
     }
 
     // Sets the indices to their place
@@ -202,8 +254,7 @@ public class Graph : MonoBehaviour
         var widthDivider = lineWidth / WidthDivider;
         for (int i = 0; i < ind.Length; i++)
         {
-            ind[i] = InitLine();
-            ind[i].name = objectName;
+            ind[i] = InitLine(objectName);
             ind[i].startWidth = widthDivider;
             ind[i].endWidth = widthDivider;
             ind[i].SetPosition(0,

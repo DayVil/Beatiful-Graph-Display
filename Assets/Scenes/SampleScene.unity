@@ -461,43 +461,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   canvasGameObj: {fileID: 1037373963}
-  xLength: 13.5
-  yLength: 6
+  xLength: 15
+  yLength: 7
   lineWidth: 0.08
   materialLine: {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
-  colorForLine:
-    serializedVersion: 2
-    key0: {r: 0.26415092, g: 0.26415092, b: 0.26415092, a: 1}
-    key1: {r: 0.26415092, g: 0.26415092, b: 0.26415092, a: 1}
-    key2: {r: 0.3647059, g: 0.3647059, b: 0.3647059, a: 0}
-    key3: {r: 0, g: 0, b: 0, a: 0}
-    key4: {r: 0, g: 0, b: 0, a: 0}
-    key5: {r: 0, g: 0, b: 0, a: 0}
-    key6: {r: 0, g: 0, b: 0, a: 0}
-    key7: {r: 0, g: 0, b: 0, a: 0}
-    ctime0: 0
-    ctime1: 65535
-    ctime2: 65535
-    ctime3: 0
-    ctime4: 0
-    ctime5: 0
-    ctime6: 0
-    ctime7: 0
-    atime0: 0
-    atime1: 65535
-    atime2: 0
-    atime3: 0
-    atime4: 0
-    atime5: 0
-    atime6: 0
-    atime7: 0
-    m_Mode: 0
-    m_NumColorKeys: 2
-    m_NumAlphaKeys: 2
+  colorForLine: {r: 0.0944108, g: 0.0944108, b: 0.11320752, a: 1}
   indexWidth: 0.15
-  toMaxX: 0
-  toMaxY: 0
-  materialNum: {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
+  toMaxX: 20
+  toMaxY: 12
   enableArrowheadX: 1
   enableArrowheadY: 1
 --- !u!4 &1269772032
