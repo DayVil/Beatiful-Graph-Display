@@ -99,7 +99,7 @@ public class Graph : MonoBehaviour
     }
 
     // Inits a usable Linerenderer for this project
-    private LineRenderer InitLine(string lineName, Transform parent)
+    public LineRenderer InitLine(string lineName, Transform parent)
     {
         var l = new GameObject(lineName).AddComponent<LineRenderer>();
         l.gameObject.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
@@ -141,7 +141,7 @@ public class Graph : MonoBehaviour
         {
             _yNumList[i] = InitNum("Number Y");
             _yNumList[i].fontStyle = FontStyle.Bold;
-            _yNumList[i].transform.position = new Vector3(-7.5f, -3.27f) + new Vector3(0, i + 1);
+            _yNumList[i].transform.position = new Vector3(-7.7f, -3.27f) + new Vector3(0, i + 1);
         }
     }
 
@@ -208,7 +208,7 @@ public class Graph : MonoBehaviour
         for (var i = 0; i < _xNumList.Length; i++)
             if (CheckIfAppears(i, enableArrowheadX, xLength))
             {
-                var calc = Mathf.Round(tmpX * (i + 1));
+                var calc = Mathf.Round(tmpX * (i + 1) * 10) / 10;
                 _xNumList[i].text = calc.ToString(CultureInfo.CurrentCulture);
                 _xNumList[i].enabled = true;
             }
@@ -221,7 +221,7 @@ public class Graph : MonoBehaviour
         for (var i = 0; i < _yNumList.Length; i++)
             if (CheckIfAppears(i, enableArrowheadY, yLength))
             {
-                var calc = Mathf.Round(tmpY * (i + 1));
+                var calc = Mathf.Round(tmpY * (i + 1) * 10) / 10;
                 _yNumList[i].text = calc.ToString(CultureInfo.CurrentCulture);
                 _yNumList[i].enabled = true;
             }

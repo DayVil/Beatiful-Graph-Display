@@ -441,6 +441,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1269772032}
   - component: {fileID: 1269772031}
+  - component: {fileID: 1269772033}
   m_Layer: 0
   m_Name: Graph
   m_TagString: Untagged
@@ -467,8 +468,8 @@ MonoBehaviour:
   materialLine: {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
   colorForLine: {r: 0.0944108, g: 0.0944108, b: 0.11320752, a: 1}
   indexWidth: 0.15
-  toMaxX: 20
-  toMaxY: 12
+  toMaxX: 10
+  toMaxY: 5
   enableArrowheadX: 1
   enableArrowheadY: 1
 --- !u!4 &1269772032
@@ -487,3 +488,17 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1269772033
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1269772030}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3cc1d84717f7d049bc029cd601441cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  amountOfPoints: 1000
+  graphColor: {r: 0.46226418, g: 0.09332503, b: 0.09332503, a: 1}
